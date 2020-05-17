@@ -1,7 +1,7 @@
 <script>
   import Snake from "./Snake.svelte";
   import Food from "./Food.svelte";
-  let scale = 100;
+  let scale = 50;
   let interval = 400;
   let foodLeft = scale;
   let foodTop = scale * 4;
@@ -35,7 +35,7 @@
       moveFood();
       snakeBodies = [...snakeBodies, snakeBodies[snakeBodies.length - 1]];
       let newSpeed = scale / interval;
-      newSpeed = newSpeed * 1.1;
+      newSpeed = newSpeed * 1.05;
       console.log(scale, interval, newSpeed);
       console.log(newSpeed * interval);
       interval = Math.floor(scale / newSpeed);
@@ -89,7 +89,7 @@
   function resetGame() {
     moveFood();
     direction = "right";
-    interval = 400;
+    interval = Math.floor(scale * 8);
     snakeBodies = [
       {
         left: scale * 2,
