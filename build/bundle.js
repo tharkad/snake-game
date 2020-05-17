@@ -863,8 +863,8 @@ var app = (function () {
     	};
     }
 
-    let boardWidth = 1100;
-    let boardHeight = 800;
+    let boardWidth = 1200;
+    let boardHeight = 700;
 
     function isCollide(a, b) {
     	return !(a.top < b.top || a.top > b.top || a.left < b.left || a.left > b.left);
