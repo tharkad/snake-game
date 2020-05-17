@@ -5,10 +5,13 @@
   let interval = 400;
   let foodLeft = scale;
   let foodTop = scale * 4;
-  let boardWidth = 1200;
-  let boardHeight = 900;
+  let boardWidth = 1100;
+  let boardHeight = 800;
   let direction = "right";
   let snakeBodies = [];
+  let sizes = [25, 50, 100];
+  let sizeSelected = scale;
+
   
   $: score = snakeBodies.length - 3;
   $: speed = Math.floor(scale/interval * 100);
@@ -118,6 +121,12 @@
     }
 
     return false;
+  };
+
+  function scaleChanged(e) {
+    scale = sizeSelected;
+    e.currentTarget.blur();
+    resetGame();
   }
 
   function onKeyDown(e) {
@@ -142,13 +151,44 @@
   h1 {
     text-align: center;
   }
+  .sizeForm {
+    text-align: center;
+  }
+  table {
+    border:1px solid black;
+    margin-left:auto;
+    margin-right:auto;
+    font-size: 2em;
+  }
+  td {
+    padding: 10px;
+  }
 </style>
 
-<h1>Snake Game</h1>
+<table>
+  <tr>
+    <th colspan="3">Snake Game</th>
+  </tr>
+  <tr>
+    <td>Score {score}</td><td>Speed {speed}</td>
+    <td>
+      <form class="sizeForm">
+        Size: <select bind:value={sizeSelected} on:change={scaleChanged}>
+          {#each sizes as size}
+            <option value={size}>
+              {size}
+            </option>
+          {/each}
+        </select>
+      </form>    
+    </td>
+  </tr>
+</table>
+
 <main style="width: {boardWidth}px; height: {boardHeight}px">
   <Snake {snakeBodies} {direction} {scale}/>
   <Food {foodTop} {foodLeft} {scale}/>
 </main>
-<h2>Score {score}</h2>
-<h2>Speed {speed}</h2>
-<svelte:window on:keydown={onKeyDown}/>
+
+
+<svelte:window on:keydown={onKeyDown}/> 
