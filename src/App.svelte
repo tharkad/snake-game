@@ -5,8 +5,8 @@
   let interval = 400;
   let foodLeft = scale;
   let foodTop = scale * 4;
-  let boardWidth = 1100;
-  let boardHeight = 800;
+  let boardWidth = 1200;
+  let boardHeight = 700;
   let direction = "right";
   let snakeBodies = [];
   let sizes = [25, 50, 100];
