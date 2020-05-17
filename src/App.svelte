@@ -1,7 +1,7 @@
 <script>
   import Snake from "./Snake.svelte";
   import Food from "./Food.svelte";
-  let scale = 50;
+  let scale = 100;
   let interval = 400;
   let foodLeft = scale;
   let foodTop = scale * 4;
@@ -11,6 +11,7 @@
   let snakeBodies = [];
   
   $: score = snakeBodies.length - 3;
+  $: speed = Math.floor(scale/interval * 100);
 
   function gameLoop() {
     snakeBodies.pop();
@@ -33,9 +34,13 @@
     if (isCollide(newHead, {left: foodLeft, top: foodTop})) {
       moveFood();
       snakeBodies = [...snakeBodies, snakeBodies[snakeBodies.length - 1]];
-      if (interval > 100) {
-        interval -= 10;
-      }
+      let newSpeed = scale / interval;
+      newSpeed = newSpeed * 1.1;
+      console.log(scale, interval, newSpeed);
+      console.log(newSpeed * interval);
+      interval = Math.floor(scale / newSpeed);
+      console.log(interval);
+      speed = Math.floor(Math.floor((scale/interval) * 10000) / 100);
     }
 
     if (isGameOver()) {
@@ -84,6 +89,7 @@
   function resetGame() {
     moveFood();
     direction = "right";
+    interval = 400;
     snakeBodies = [
       {
         left: scale * 2,
@@ -144,4 +150,5 @@
   <Food {foodTop} {foodLeft} {scale}/>
 </main>
 <h2>Score {score}</h2>
+<h2>Speed {speed}</h2>
 <svelte:window on:keydown={onKeyDown}/>
