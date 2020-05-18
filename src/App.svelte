@@ -11,43 +11,47 @@
   let snakeBodies = [];
   let sizes = [25, 50, 100];
   let sizeSelected = scale;
+  let gameOver = false;
 
-  
   $: score = snakeBodies.length - 3;
   $: speed = Math.floor(scale/interval * 100);
 
   function gameLoop() {
-    snakeBodies.pop();
+    if (!gameOver) {
+      let newSnakeBodies = [...snakeBodies];
+      newSnakeBodies.pop();
 
-    let {left, top} = snakeBodies[0];
+      let {left, top} = newSnakeBodies[0];
 
-    if (direction === "up") {
-      top -= scale;
-    } else if (direction === "down") {
-      top += scale;
-    } else if (direction === "left") {
-      left -= scale;
-    } else if (direction === "right") {
-      left += scale;
-    }
+      if (direction === "up") {
+        top -= scale;
+      } else if (direction === "down") {
+        top += scale;
+      } else if (direction === "left") {
+        left -= scale;
+      } else if (direction === "right") {
+        left += scale;
+      }
 
-    const newHead = {left, top};
-    snakeBodies = [newHead, ...snakeBodies];
+      const newHead = {left, top};
+      newSnakeBodies = [newHead, ...newSnakeBodies];
 
-    if (isCollide(newHead, {left: foodLeft, top: foodTop})) {
-      moveFood();
-      snakeBodies = [...snakeBodies, snakeBodies[snakeBodies.length - 1]];
-      let newSpeed = scale / interval;
-      newSpeed = newSpeed * 1.05;
-      console.log(scale, interval, newSpeed);
-      console.log(newSpeed * interval);
-      interval = Math.floor(scale / newSpeed);
-      console.log(interval);
-      speed = Math.floor(Math.floor((scale/interval) * 10000) / 100);
-    }
+      if (isGameOver(newSnakeBodies)) {
+        //resetGame();
+        gameOver = true;
+      }
+      else {
+        snakeBodies = [...newSnakeBodies];
 
-    if (isGameOver()) {
-      resetGame();
+        if (isCollide(newHead, {left: foodLeft, top: foodTop})) {
+          moveFood();
+          snakeBodies = [...snakeBodies, snakeBodies[snakeBodies.length - 1]];
+          let newSpeed = scale / interval;
+          newSpeed = newSpeed * 1.05;
+          interval = Math.floor(scale / newSpeed);
+          speed = Math.floor(Math.floor((scale/interval) * 10000) / 100);
+        }
+      }
     }
 
     setTimeout(gameLoop, interval);
@@ -74,14 +78,14 @@
     }
   }
 
-  function isGameOver() {
-    const snakeBodiesNoHead = snakeBodies.slice(1);
-    const snakeCollisions = snakeBodiesNoHead.filter(sb => isCollide(sb, snakeBodies[0]));
+  function isGameOver(newSnakeBodies) {
+    const snakeBodiesNoHead = newSnakeBodies.slice(1);
+    const snakeCollisions = snakeBodiesNoHead.filter(sb => isCollide(sb, newSnakeBodies[0]));
     if (snakeCollisions.length > 0) {
       return true;
     }
 
-    const {top, left} = snakeBodies[0];
+    const {top, left} = newSnakeBodies[0];
     if (top >= boardHeight || top < 0 || left < 0 || left >= boardWidth) {
       return true;
     }
@@ -90,6 +94,7 @@
   }
 
   function resetGame() {
+    gameOver = false;
     moveFood();
     direction = "right";
     interval = Math.floor(scale * 8);
@@ -130,6 +135,9 @@
   }
 
   function onKeyDown(e) {
+    if (gameOver && e.keyCode === 13) {
+      resetGame();
+    }
     const newDirection = getDirectionFromKeyCode(e.keyCode);
     if (newDirection) {
       direction = newDirection;
@@ -167,7 +175,12 @@
 
 <table>
   <tr>
-    <th colspan="3">Snake Game</th>
+    <th colspan="3">
+      {#if gameOver}
+        Game Over - Press Enter
+      {:else}
+        Snake Game
+      {/if}
   </tr>
   <tr>
     <td>Score {score}</td><td>Speed {speed}</td>
