@@ -652,7 +652,41 @@ var app = (function () {
     	return child_ctx;
     }
 
-    // (177:10) {#each sizes as size}
+    // (181:6) {:else}
+    function create_else_block(ctx) {
+    	let t;
+
+    	return {
+    		c() {
+    			t = text("Snake Game");
+    		},
+    		m(target, anchor) {
+    			insert(target, t, anchor);
+    		},
+    		d(detaching) {
+    			if (detaching) detach(t);
+    		}
+    	};
+    }
+
+    // (179:6) {#if gameOver}
+    function create_if_block$1(ctx) {
+    	let t;
+
+    	return {
+    		c() {
+    			t = text("Game Over - Press Enter");
+    		},
+    		m(target, anchor) {
+    			insert(target, t, anchor);
+    		},
+    		d(detaching) {
+    			if (detaching) detach(t);
+    		}
+    	};
+    }
+
+    // (190:10) {#each sizes as size}
     function create_each_block$1(ctx) {
     	let option;
     	let t0_value = /*size*/ ctx[17] + "";
@@ -683,25 +717,34 @@ var app = (function () {
     function create_fragment$3(ctx) {
     	let table;
     	let tr0;
-    	let t1;
+    	let th;
+    	let t0;
     	let tr1;
     	let td0;
+    	let t1;
     	let t2;
-    	let t3;
     	let td1;
+    	let t3;
     	let t4;
     	let t5;
-    	let t6;
     	let td2;
     	let form;
-    	let t7;
+    	let t6;
     	let select;
-    	let t8;
+    	let t7;
     	let main;
-    	let t9;
+    	let t8;
     	let current;
     	let dispose;
-    	let each_value = /*sizes*/ ctx[8];
+
+    	function select_block_type(ctx, dirty) {
+    		if (/*gameOver*/ ctx[6]) return create_if_block$1;
+    		return create_else_block;
+    	}
+
+    	let current_block_type = select_block_type(ctx);
+    	let if_block = current_block_type(ctx);
+    	let each_value = /*sizes*/ ctx[9];
     	let each_blocks = [];
 
     	for (let i = 0; i < each_value.length; i += 1) {
@@ -728,30 +771,32 @@ var app = (function () {
     		c() {
     			table = element("table");
     			tr0 = element("tr");
-    			tr0.innerHTML = `<th colspan="3">Snake Game</th>`;
-    			t1 = space();
+    			th = element("th");
+    			if_block.c();
+    			t0 = space();
     			tr1 = element("tr");
     			td0 = element("td");
-    			t2 = text("Score ");
-    			t3 = text(/*score*/ ctx[6]);
+    			t1 = text("Score ");
+    			t2 = text(/*score*/ ctx[7]);
     			td1 = element("td");
-    			t4 = text("Speed ");
-    			t5 = text(/*speed*/ ctx[7]);
-    			t6 = space();
+    			t3 = text("Speed ");
+    			t4 = text(/*speed*/ ctx[8]);
+    			t5 = space();
     			td2 = element("td");
     			form = element("form");
-    			t7 = text("Size: ");
+    			t6 = text("Size: ");
     			select = element("select");
 
     			for (let i = 0; i < each_blocks.length; i += 1) {
     				each_blocks[i].c();
     			}
 
-    			t8 = space();
+    			t7 = space();
     			main = element("main");
     			create_component(snake.$$.fragment);
-    			t9 = space();
+    			t8 = space();
     			create_component(food.$$.fragment);
+    			attr(th, "colspan", "3");
     			attr(td0, "class", "svelte-16r7gzt");
     			attr(td1, "class", "svelte-16r7gzt");
     			if (/*sizeSelected*/ ctx[5] === void 0) add_render_callback(() => /*select_change_handler*/ ctx[16].call(select));
@@ -765,18 +810,20 @@ var app = (function () {
     		m(target, anchor, remount) {
     			insert(target, table, anchor);
     			append(table, tr0);
-    			append(table, t1);
+    			append(tr0, th);
+    			if_block.m(th, null);
+    			append(table, t0);
     			append(table, tr1);
     			append(tr1, td0);
+    			append(td0, t1);
     			append(td0, t2);
-    			append(td0, t3);
     			append(tr1, td1);
+    			append(td1, t3);
     			append(td1, t4);
-    			append(td1, t5);
-    			append(tr1, t6);
+    			append(tr1, t5);
     			append(tr1, td2);
     			append(td2, form);
-    			append(form, t7);
+    			append(form, t6);
     			append(form, select);
 
     			for (let i = 0; i < each_blocks.length; i += 1) {
@@ -784,26 +831,36 @@ var app = (function () {
     			}
 
     			select_option(select, /*sizeSelected*/ ctx[5]);
-    			insert(target, t8, anchor);
+    			insert(target, t7, anchor);
     			insert(target, main, anchor);
     			mount_component(snake, main, null);
-    			append(main, t9);
+    			append(main, t8);
     			mount_component(food, main, null);
     			current = true;
     			if (remount) run_all(dispose);
 
     			dispose = [
-    				listen(window, "keydown", /*onKeyDown*/ ctx[10]),
+    				listen(window, "keydown", /*onKeyDown*/ ctx[11]),
     				listen(select, "change", /*select_change_handler*/ ctx[16]),
-    				listen(select, "change", /*scaleChanged*/ ctx[9])
+    				listen(select, "change", /*scaleChanged*/ ctx[10])
     			];
     		},
     		p(ctx, [dirty]) {
-    			if (!current || dirty & /*score*/ 64) set_data(t3, /*score*/ ctx[6]);
-    			if (!current || dirty & /*speed*/ 128) set_data(t5, /*speed*/ ctx[7]);
+    			if (current_block_type !== (current_block_type = select_block_type(ctx))) {
+    				if_block.d(1);
+    				if_block = current_block_type(ctx);
 
-    			if (dirty & /*sizes*/ 256) {
-    				each_value = /*sizes*/ ctx[8];
+    				if (if_block) {
+    					if_block.c();
+    					if_block.m(th, null);
+    				}
+    			}
+
+    			if (!current || dirty & /*score*/ 128) set_data(t2, /*score*/ ctx[7]);
+    			if (!current || dirty & /*speed*/ 256) set_data(t4, /*speed*/ ctx[8]);
+
+    			if (dirty & /*sizes*/ 512) {
+    				each_value = /*sizes*/ ctx[9];
     				let i;
 
     				for (i = 0; i < each_value.length; i += 1) {
@@ -853,8 +910,9 @@ var app = (function () {
     		},
     		d(detaching) {
     			if (detaching) detach(table);
+    			if_block.d();
     			destroy_each(each_blocks, detaching);
-    			if (detaching) detach(t8);
+    			if (detaching) detach(t7);
     			if (detaching) detach(main);
     			destroy_component(snake);
     			destroy_component(food);
@@ -868,6 +926,23 @@ var app = (function () {
 
     function isCollide(a, b) {
     	return !(a.top < b.top || a.top > b.top || a.left < b.left || a.left > b.left);
+    }
+
+    function isGameOver(newSnakeBodies) {
+    	const snakeBodiesNoHead = newSnakeBodies.slice(1);
+    	const snakeCollisions = snakeBodiesNoHead.filter(sb => isCollide(sb, newSnakeBodies[0]));
+
+    	if (snakeCollisions.length > 0) {
+    		return true;
+    	}
+
+    	const { top, left } = newSnakeBodies[0];
+
+    	if (top >= boardHeight || top < 0 || left < 0 || left >= boardWidth) {
+    		return true;
+    	}
+
+    	return false;
     }
 
     function getDirectionFromKeyCode(keyCode) {
@@ -893,38 +968,42 @@ var app = (function () {
     	let snakeBodies = [];
     	let sizes = [25, 50, 100];
     	let sizeSelected = scale;
+    	let gameOver = false;
 
     	function gameLoop() {
-    		snakeBodies.pop();
-    		let { left, top } = snakeBodies[0];
+    		if (!gameOver) {
+    			let newSnakeBodies = [...snakeBodies];
+    			newSnakeBodies.pop();
+    			let { left, top } = newSnakeBodies[0];
 
-    		if (direction === "up") {
-    			top -= scale;
-    		} else if (direction === "down") {
-    			top += scale;
-    		} else if (direction === "left") {
-    			left -= scale;
-    		} else if (direction === "right") {
-    			left += scale;
-    		}
+    			if (direction === "up") {
+    				top -= scale;
+    			} else if (direction === "down") {
+    				top += scale;
+    			} else if (direction === "left") {
+    				left -= scale;
+    			} else if (direction === "right") {
+    				left += scale;
+    			}
 
-    		const newHead = { left, top };
-    		$$invalidate(4, snakeBodies = [newHead, ...snakeBodies]);
+    			const newHead = { left, top };
+    			newSnakeBodies = [newHead, ...newSnakeBodies];
 
-    		if (isCollide(newHead, { left: foodLeft, top: foodTop })) {
-    			moveFood();
-    			$$invalidate(4, snakeBodies = [...snakeBodies, snakeBodies[snakeBodies.length - 1]]);
-    			let newSpeed = scale / interval;
-    			newSpeed = newSpeed * 1.05;
-    			console.log(scale, interval, newSpeed);
-    			console.log(newSpeed * interval);
-    			$$invalidate(11, interval = Math.floor(scale / newSpeed));
-    			console.log(interval);
-    			$$invalidate(7, speed = Math.floor(Math.floor(scale / interval * 10000) / 100));
-    		}
+    			if (isGameOver(newSnakeBodies)) {
+    				//resetGame();
+    				$$invalidate(6, gameOver = true);
+    			} else {
+    				$$invalidate(4, snakeBodies = [...newSnakeBodies]);
 
-    		if (isGameOver()) {
-    			resetGame();
+    				if (isCollide(newHead, { left: foodLeft, top: foodTop })) {
+    					moveFood();
+    					$$invalidate(4, snakeBodies = [...snakeBodies, snakeBodies[snakeBodies.length - 1]]);
+    					let newSpeed = scale / interval;
+    					newSpeed = newSpeed * 1.05;
+    					$$invalidate(12, interval = Math.floor(scale / newSpeed));
+    					$$invalidate(8, speed = Math.floor(Math.floor(scale / interval * 10000) / 100));
+    				}
+    			}
     		}
 
     		setTimeout(gameLoop, interval);
@@ -944,27 +1023,11 @@ var app = (function () {
     		}
     	}
 
-    	function isGameOver() {
-    		const snakeBodiesNoHead = snakeBodies.slice(1);
-    		const snakeCollisions = snakeBodiesNoHead.filter(sb => isCollide(sb, snakeBodies[0]));
-
-    		if (snakeCollisions.length > 0) {
-    			return true;
-    		}
-
-    		const { top, left } = snakeBodies[0];
-
-    		if (top >= boardHeight || top < 0 || left < 0 || left >= boardWidth) {
-    			return true;
-    		}
-
-    		return false;
-    	}
-
     	function resetGame() {
+    		$$invalidate(6, gameOver = false);
     		moveFood();
     		$$invalidate(3, direction = "right");
-    		$$invalidate(11, interval = Math.floor(scale * 8));
+    		$$invalidate(12, interval = Math.floor(scale * 8));
     		$$invalidate(4, snakeBodies = [{ left: scale * 2, top: 0 }, { left: scale, top: 0 }, { left: 0, top: 0 }]);
     	}
 
@@ -977,6 +1040,10 @@ var app = (function () {
     	}
 
     	function onKeyDown(e) {
+    		if (gameOver && e.keyCode === 13) {
+    			resetGame();
+    		}
+
     		const newDirection = getDirectionFromKeyCode(e.keyCode);
 
     		if (newDirection) {
@@ -990,7 +1057,7 @@ var app = (function () {
     	function select_change_handler() {
     		sizeSelected = select_value(this);
     		$$invalidate(5, sizeSelected);
-    		$$invalidate(8, sizes);
+    		$$invalidate(9, sizes);
     	}
 
     	let score;
@@ -998,11 +1065,11 @@ var app = (function () {
 
     	$$self.$$.update = () => {
     		if ($$self.$$.dirty & /*snakeBodies*/ 16) {
-    			 $$invalidate(6, score = snakeBodies.length - 3);
+    			 $$invalidate(7, score = snakeBodies.length - 3);
     		}
 
-    		if ($$self.$$.dirty & /*scale, interval*/ 2049) {
-    			 $$invalidate(7, speed = Math.floor(scale / interval * 100));
+    		if ($$self.$$.dirty & /*scale, interval*/ 4097) {
+    			 $$invalidate(8, speed = Math.floor(scale / interval * 100));
     		}
     	};
 
@@ -1013,6 +1080,7 @@ var app = (function () {
     		direction,
     		snakeBodies,
     		sizeSelected,
+    		gameOver,
     		score,
     		speed,
     		sizes,
@@ -1021,7 +1089,6 @@ var app = (function () {
     		interval,
     		gameLoop,
     		moveFood,
-    		isGameOver,
     		resetGame,
     		select_change_handler
     	];
