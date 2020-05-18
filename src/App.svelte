@@ -5,6 +5,7 @@
   let interval = 400;
   let foodLeft = scale;
   let foodTop = scale * 4;
+  let foodType = "threeX";
   let boardWidth = 1200;
   let boardHeight = 700;
   let direction = "right";
@@ -37,27 +38,19 @@
       newSnakeBodies = [newHead, ...newSnakeBodies];
 
       if (isGameOver(newSnakeBodies)) {
-        //resetGame();
         gameOver = true;
       }
       else {
         snakeBodies = [...newSnakeBodies];
 
         if (isCollide(newHead, {left: foodLeft, top: foodTop})) {
-          moveFood();
-          snakeBodies = [...snakeBodies, snakeBodies[snakeBodies.length - 1]];
-          let newSpeed = scale / interval;
-          newSpeed = newSpeed * 1.05;
-          interval = Math.floor(scale / newSpeed);
-          speed = Math.floor(Math.floor((scale/interval) * 10000) / 100);
+          snakeAteFood();
         }
       }
     }
 
     setTimeout(gameLoop, interval);
   };
-
-  setTimeout(gameLoop, interval);
     
   function isCollide(a, b) {
     return !(
@@ -68,6 +61,21 @@
     );
   }
 
+  function snakeAteFood() {
+    if (foodType === "normal") {
+      snakeBodies = [...snakeBodies, snakeBodies[snakeBodies.length - 1]];
+    } else if (foodType === "threeX") {
+      snakeBodies = [...snakeBodies, snakeBodies[snakeBodies.length - 1]];
+      snakeBodies = [...snakeBodies, snakeBodies[snakeBodies.length - 1]];
+      snakeBodies = [...snakeBodies, snakeBodies[snakeBodies.length - 1]];
+    }
+    moveFood();
+    let newSpeed = scale / interval;
+    newSpeed = newSpeed * 1.05;
+    interval = Math.floor(scale / newSpeed);
+    speed = Math.floor(Math.floor((scale/interval) * 10000) / 100);
+  }
+
   function moveFood() {
     let goodFood = false;
     while (!goodFood) {
@@ -75,6 +83,11 @@
       foodLeft = Math.floor((Math.random() * (Math.floor(boardWidth/scale) - 1))) * scale;
       const foodInSnake = snakeBodies.filter(sb => isCollide(sb, {left: foodLeft, top: foodTop}));
       goodFood = (foodInSnake.length == 0);
+    }
+    if (Math.random() > 0.8) {
+      foodType = "threeX";
+    } else {
+      foodType = "normal";
     }
   }
 
@@ -145,6 +158,7 @@
   };
 
   resetGame();
+  setTimeout(gameLoop, interval);
 </script>
 
 <style>
@@ -200,7 +214,7 @@
 
 <main style="width: {boardWidth}px; height: {boardHeight}px">
   <Snake {snakeBodies} {direction} {scale}/>
-  <Food {foodTop} {foodLeft} {scale}/>
+  <Food {foodTop} {foodLeft} {scale} {foodType}/>
 </main>
 
 
