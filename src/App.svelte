@@ -5,7 +5,7 @@
   let interval = 400;
   let foodLeft = scale;
   let foodTop = scale * 4;
-  let foodType = "threeX";
+  let foodType = "normal";
   let boardWidth = 1200;
   let boardHeight = 700;
   let direction = "right";
@@ -13,6 +13,10 @@
   let sizes = [25, 50, 100];
   let sizeSelected = scale;
   let gameOver = false;
+  let slowLeft = scale * 5;
+  let slowTop = scale * 5;
+  let showSlow = false;
+  let slowTickShown = 0;
 
   $: score = snakeBodies.length - 3;
   $: speed = Math.floor(scale/interval * 100);
@@ -45,6 +49,22 @@
 
         if (isCollide(newHead, {left: foodLeft, top: foodTop})) {
           snakeAteFood();
+        } else if (isCollide(newHead, {left: slowLeft, top: slowTop})) {
+          snakeAteSlow();
+        }       
+
+        if (showSlow) {
+          slowTickShown += 1;
+          if (Math.random() < (slowTickShown/2000)) {
+            showSlow = false;
+            slowTickShown = 0;
+            moveSlow();
+          }
+        } else {
+          if (Math.random() > 0.995) {
+            moveSlow();
+            showSlow = true;
+          }
         }
       }
     }
@@ -76,6 +96,15 @@
     speed = Math.floor(Math.floor((scale/interval) * 10000) / 100);
   }
 
+  function snakeAteSlow() {
+    showSlow = false;
+    slowTickShown = 0;
+    let newSpeed = scale / interval;
+    newSpeed = newSpeed * 0.75;
+    interval = Math.floor(scale / newSpeed);
+    speed = Math.floor(Math.floor((scale/interval) * 10000) / 100);
+  }
+
   function moveFood() {
     let goodFood = false;
     while (!goodFood) {
@@ -88,6 +117,16 @@
       foodType = "threeX";
     } else {
       foodType = "normal";
+    }
+  }
+
+  function moveSlow() {
+    let goodFood = false;
+    while (!goodFood) {
+      slowTop = Math.floor((Math.random() * (Math.floor(boardHeight/scale) - 1))) * scale;
+      slowLeft = Math.floor((Math.random() * (Math.floor(boardWidth/scale) - 1))) * scale;
+      const foodInSnake = snakeBodies.filter(sb => isCollide(sb, {left: slowLeft, top: slowTop}));
+      goodFood = (foodInSnake.length == 0);
     }
   }
 
@@ -108,7 +147,9 @@
 
   function resetGame() {
     gameOver = false;
+    showSlow = false;
     moveFood();
+    moveSlow();
     direction = "right";
     interval = Math.floor(scale * 8);
     snakeBodies = [
@@ -169,10 +210,6 @@
     background-image: url("../background.jpg");
     background-size: cover;
   }
-  h2,
-  h1 {
-    text-align: center;
-  }
   .sizeForm {
     text-align: center;
   }
@@ -181,9 +218,13 @@
     margin-left:auto;
     margin-right:auto;
     font-size: 2em;
+    align-content: center;
   }
-  td {
-    padding: 10px;
+  td, th {
+    text-align: center;
+    align-items: center;
+    align-content: center;
+    padding: 4px;
   }
 </style>
 
@@ -195,6 +236,11 @@
       {:else}
         Snake Game
       {/if}
+  </tr>
+  <tr>
+    <td>Food<Food {scale} foodType='legendNormal' /></td>
+    <td>3X Food<Food {scale} foodType='legendThreeX' /></td>
+    <td>Slow<Food {scale} foodType='legendSlow' /></td>
   </tr>
   <tr>
     <td>Score {score}</td><td>Speed {speed}</td>
@@ -214,7 +260,10 @@
 
 <main style="width: {boardWidth}px; height: {boardHeight}px">
   <Snake {snakeBodies} {direction} {scale}/>
-  <Food {foodTop} {foodLeft} {scale} {foodType}/>
+  <Food {foodTop} {foodLeft} {scale} {foodType} />
+  {#if showSlow}
+    <Food foodTop={slowTop} foodLeft={slowLeft} {scale} foodType='slow' />
+  {/if}
 </main>
 
 
