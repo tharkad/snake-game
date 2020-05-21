@@ -61,7 +61,7 @@
             moveSlow();
           }
         } else {
-          if (Math.random() > 0.995) {
+          if (Math.random() > 0.996) {
             moveSlow();
             showSlow = true;
           }
