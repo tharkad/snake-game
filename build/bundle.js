@@ -1401,7 +1401,7 @@ var app = (function () {
     						moveSlow();
     					}
     				} else {
-    					if (Math.random() > 0.995) {
+    					if (Math.random() > 0.996) {
     						moveSlow();
     						$$invalidate(10, showSlow = true);
     					}
